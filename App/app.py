@@ -1,21 +1,20 @@
 import streamlit as st
-
 import pandas as pd
 import numpy as np
-
+import os 
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
 
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # -----------------------------
 # Page Configuration
 # -----------------------------
 st.set_page_config(
     page_title="Retail Sales Forecasting",
     page_icon="📈",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
-
 # -----------------------------
 # Sidebar Navigation
 # -----------------------------
@@ -23,9 +22,7 @@ st.sidebar.image(
     "https://img.icons8.com/color/96/combo-chart--v1.png",
     width=80
 )
-
 st.sidebar.title("Retail Sales Forecasting")
-
 page = st.sidebar.radio(
     "Navigation",
     [
@@ -36,52 +33,34 @@ page = st.sidebar.radio(
         "ℹ️ About Project"
     ]
 )
-
 # -----------------------------
 # HOME PAGE
 # -----------------------------
 if page == "🏠 Home":
 
     st.title("📈 Retail Sales Forecasting Using LSTM")
-
     st.markdown("---")
-
     st.write("""
 Welcome to the **Retail Sales Forecasting System**.
-
 This project predicts future retail sales using **Long Short-Term Memory (LSTM)**,
 which is an advanced **Recurrent Neural Network (RNN)**.
-
 The model learns historical sales patterns and predicts upcoming weekly sales.
-
 This application was developed using **Python, TensorFlow, Streamlit, Plotly,
 Pandas and Scikit-Learn**.
 """)
-
     st.markdown("---")
-
     col1, col2, col3 = st.columns(3)
-
     col1.metric("Algorithm", "LSTM")
     col2.metric("Model Type", "RNN")
     col3.metric("Framework", "TensorFlow")
-
     st.markdown("---")
-
     st.subheader("✨ Features")
-
     st.write("✅ Predict Future Weekly Sales")
-
     st.write("✅ Forecast Dashboard")
-
     st.write("✅ Interactive Graph")
-
     st.write("✅ Dataset Explorer")
-
     st.write("✅ Download Forecast CSV")
-
     st.success("Project Loaded Successfully 🚀")
-
 # -----------------------------
 # PREDICT PAGE
 # -----------------------------
@@ -91,15 +70,16 @@ elif page == "📈 Predict Sales":
 
     st.markdown("### Enter the last 10 weekly sales values")
 
-    # Load model
-    model = load_model("../Models/lstm_sales_forecasting.keras")
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-    # Load training dataset
-    train = pd.read_csv("../Dataset/train.csv")
+    MODEL_PATH = os.path.join(BASE_DIR, "..", "Models", "lstm_sales_forecasting.keras")
+    model = load_model(MODEL_PATH)
+
+    DATA_PATH = os.path.join(BASE_DIR, "..", "Dataset", "train.csv")
+    train = pd.read_csv(DATA_PATH)
 
     sales = train["Weekly_Sales"].values.reshape(-1,1)
 
-    # Scale values
     scaler = MinMaxScaler()
     scaler.fit(sales)
 
@@ -166,7 +146,13 @@ elif page == "📊 Forecast Dashboard":
 
     # Load Forecast CSV
     try:
-        forecast = pd.read_csv("../Forecast/future_sales_forecast.csv")
+        FORECAST_PATH = os.path.join(
+            BASE_DIR,
+            "..",
+            "Forecast",
+            "future_sales_forecast.csv"
+        )
+        forecast = pd.read_csv(FORECAST_PATH)
 
     except FileNotFoundError:
         st.error("Forecast file not found!")
@@ -285,7 +271,13 @@ elif page == "📋 Dataset Explorer":
 
     # Load Dataset
     try:
-        train = pd.read_csv("../Dataset/train.csv")
+        TRAIN_PATH = os.path.join(
+            BASE_DIR,
+            "..",
+            "Dataset",
+            "train.csv"
+        )
+        train = pd.read_csv(TRAIN_PATH)
     except FileNotFoundError:
         st.error("train.csv not found!")
         st.stop()
